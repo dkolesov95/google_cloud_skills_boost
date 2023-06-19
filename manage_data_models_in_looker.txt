@@ -1,0 +1,136 @@
+Manage Data Models in Looker: Challenge Lab
+
+
+Task 1. Create LookML objects
+
+order_items.view
+
+dimension: profit {
+label: "profit"
+description: ""
+type: number
+sql: ${sale_price} - ${products.cost} ;;
+value_format_name: usd
+}
+
+measure: total_profit {
+label: "total_profit"
+description: ""
+type: sum
+sql: ${profit} ;;
+value_format_name: usd
+}
+
+training_ecommerce.model
+
+datagroup: weekly_datagroup_RQCW {
+max_cache_age: "168 hours"
+}
+
+persist_with: weekly_datagroup_RQCW
+
+
+Task 2. Create and fix a refinement with an aggregate table
+
+explore: +order_items {
+  label: "+order_items"
+  aggregate_table: weekly_aggregate_revenue_profit {
+    query: {
+      dimensions: [order_items.created_date]
+      measures: [order_items.total_revenue, order_items.total_profit]
+    }
+    materialization: {
+      datagroup_trigger: weekly_datagroup_RQCW
+      increment_key: "created_date"
+    }
+  }
+}
+
+
+Task 3. Extend a view
+
+view: user_pii_challenge_WLBZ {
+  extension: required
+  
+  dimension: id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.id ;;
+  }
+  
+  dimension: email {
+    type: string
+    sql: ${TABLE}.email ;;
+  }
+  
+  dimension: first_name {
+    type: string
+    sql: ${TABLE}.first_name ;;
+  }
+  
+  dimension: last_name {
+    type: string
+    sql: ${TABLE}.last_name ;;
+  }
+  
+  dimension: latitude {
+    type: number
+    sql: ${TABLE}.latitude ;;
+  }
+  
+  dimension: longitude {
+    type: number
+    sql: ${TABLE}.longitude ;;
+  }
+}
+
+
+Task 4. Group similar fields in views
+
+users.view
+  
+  dimension: age {
+    type: number
+    group_label:"User Information (Challenge qWSN)"
+    sql: ${TABLE}.age ;;
+  }
+  dimension: city {
+    group_label: "User Information (Challenge qWSN)"
+    type: string
+    sql: ${TABLE}.city ;;
+  }
+  dimension: country {
+    type: string
+    group_label: "User Information (Challenge qWSN)"
+    map_layer_name: countries
+    sql: ${TABLE}.country ;;
+  }
+  dimension: state {
+    type: string
+    group_label: "User Information (Challenge qWSN)"
+    sql: ${TABLE}.state ;;
+    map_layer_name: us_states
+  }
+
+product.view
+
+  dimension: brand {
+    type: string
+    group_label: "Product Information (Challenge 9sBb)"
+    sql: ${TABLE}.brand ;;
+  }
+  dimension: category {
+    type: string
+    group_label: "Product Information (Challenge 9sBb)"
+    sql: ${TABLE}.category ;;
+  }
+   dimension: department {
+    type: string
+    group_label: "Product Information (Challenge 9sBb)"
+    sql: ${TABLE}.department ;;
+  }
+  dimension: name {
+    type: string
+    group_label: "Product Information (Challenge 9sBb)"
+    sql: ${TABLE}.name ;;
+  }
